@@ -34,6 +34,7 @@ public class AddBoardController extends HttpServlet {
 	}
 
 	protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
+		request.setCharacterEncoding("UTF-8");
 		List<BoardVo> boardList = boardService.BoardList();
 		request.getServletContext().setAttribute("BOARD_INFO", boardList);
 		request.getRequestDispatcher("/board/addBoard.jsp").forward(request, response);
