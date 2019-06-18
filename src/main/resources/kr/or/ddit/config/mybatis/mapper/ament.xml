@@ -1,0 +1,45 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+  PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+  "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+
+<mapper namespace="ament">
+
+<insert id="insertAment" parameterType="amentVo">
+insert into AMENT 
+values(
+		ament_id.NEXTVAL
+		,#{detail_id}
+		,#{ament_path}
+		,#{ament_nm}
+
+			)
+
+</insert>
+
+
+<select id="selectAment" parameterType="String" resultType="amentVo">
+select *
+from AMENT
+where DETAIL_ID = #{detail_id}
+
+</select>
+
+<select id="selectAmentVo" parameterType="String" resultType="amentVo">
+select *
+from AMENT
+where AMENT_ID = #{AMENT_ID}
+
+</select>
+
+
+
+<delete id="deleteAment" parameterType="String">
+
+delete from AMENT where AMENT_ID = #{ament_id}
+
+</delete>
+
+
+</mapper>

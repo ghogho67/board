@@ -1,0 +1,156 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+  PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+  "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+
+<mapper namespace="board">
+
+	
+  <select id="boardList" resultType="boardVo">
+   select * from board
+    
+  	
+  </select>
+  
+  
+   <!-- 특정 사용자 조회 -->
+  <select id="getBaord" parameterType="String" resultType="boardVo">
+  select * from users where userId = #{value}
+  </select>
+  
+  
+  <insert id="insertBoard" parameterType="boardVo">
+   insert into board (board_id,userid,board_nm,board_use,board_dt)
+   values('board'||board_id.NEXTVAL, #{userid}, #{board_nm}, #{board_use}, sysdate)
+  </insert>
+  
+  
+  <update id="updateBoard" parameterType="boardVo">
+	update board
+	set  
+     BOARD_NM = #{board_nm},
+    BOARD_USE = #{board_use}
+
+	where BOARD_ID = #{board_id}
+  
+  </update>
+  
+  <update id="updateBoardUse" parameterType="boardVo">
+	update board
+	set  
+    BOARD_USE = #{board_use}
+
+	where BOARD_ID = #{board_id}
+  
+  </update>
+  
+  
+  <!--==========================================   DetailBoard   ========================================== -->
+  <!--==========================================   DetailBoard pagingList  ========================================== -->
+  
+   <select id="detailPagingList" parameterType="map" resultType="detailVo">
+   
+<![CDATA[
+  	 
+	   	select b.*, rownum rn
+		from
+		(select a.*, rownum rn
+			from
+			(select Board.DETAIL_GROUP, board.DETAIL_ID, board.DETAIL_PARENT, level-1 lv, board.DETAIL_TITLE,
+					board.USERID, board.DETAIL_DT, board.DETAIL_TEXT, board.DETAIL_USE, board.BOARD_ID 
+				from BOARDDETAIL board
+					where BOARD_ID = #{board_id}
+					start with DETAIL_PARENT is null
+					Connect by prior DETAIL_ID = DETAIL_PARENT
+					order siblings by DETAIL_GROUP desc, DETAIL_ID)a)b
+					
+					where b.rn >= (#{page}-1)*#{pageSize} and b.rn<= #{page}*#{pageSize}
+	
+  	]]>
+ </select>
+ 
+ <!-- detaileBoard 전체 수 -->
+  <select id="detailCnt" resultType="int">
+  
+  select count(*)
+  from BOARDDETAIL
+  where	BOARD_ID = #{board_id}
+  </select>
+  
+  
+  <!--==========================================   DetailBoard form  ========================================== -->
+  
+  <insert id="insertDetaileBoard" parameterType="detailVo" keyProperty="detail_id" keyColumn="detail_id" useGeneratedKeys="true">
+
+  insert into BOARDDETAIL 
+  values(DETAIL_ID.NEXTVAL, #{userid}, '', #{board_id}, sysdate, #{detail_title}, #{detail_text}, 'Y', DETAIL_ID.NEXTVAL)
+  
+  	<selectKey keyProperty="detail_id" resultType="String" order="AFTER" keyColumn="detail_id">
+  		select DETAIL_ID.currval detail_id 
+  		from dual
+  	
+  	</selectKey>
+  </insert>
+  
+  
+    <insert id="insertReplyDetail" parameterType="detailVo" keyProperty="detail_id" keyColumn="detail_id" useGeneratedKeys="true">
+
+ 	 insert into BOARDDETAIL 
+ 	 values(DETAIL_ID.NEXTVAL, #{userid}, #{detail_parent}, 
+ 		 #{board_id}, sysdate, #{detail_title}, #{detail_text}, 
+  			'Y', #{detail_group})
+  			
+  			<selectKey keyProperty="detail_id" resultType="String" order="AFTER" keyColumn="detail_id">
+  			select DETAIL_ID.currval detail_id 
+  			from dual
+  	
+  	</selectKey>
+  
+  </insert>
+  
+  <select id="selectDetailBoard" parameterType="map" resultType="detailVo">
+  
+  select *
+  from BOARDDETAIL
+  where detail_id = #{detail_id}
+  
+  </select>
+  
+   <!--==========================================   DetailBoard Modify, delete  ========================================== -->
+   
+   <update id="modifyDetailBoard" parameterType="detailVo" >
+   	update
+   		BOARDDETAIL
+   	set
+   		DETAIL_TITLE = #{detail_title}
+   	   ,DETAIL_TEXT = #{detail_text}
+   	where
+   		DETAIL_ID = #{detail_id}
+   </update>
+   
+   
+   <update id="deleteDetailBoard" parameterType="String">
+   update
+  	 BOARDDETAIL
+   set
+   	 DETAIL_USE = 'N'
+   where
+   	 DETAIL_ID = #{detail_id}
+   
+   </update>
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+
+</mapper>

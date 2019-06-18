@@ -1,0 +1,32 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+  PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+  "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+  
+<mapper namespace="reply">
+	
+	<select id="replyList" parameterType="String" resultType="replyVo">
+	select a.*,rownum rn
+	from
+	(select *
+	from REPLY
+	where Detail_Id = #{detail_id}
+	order by rownum)a
+	</select>
+	
+	<insert id="insertReply" parameterType="replyVo">
+	insert into reply values(reply_id.NEXTVAL,#{userid},#{detail_id},sysdate,#{reply_text},'Y')
+	</insert>
+	
+	
+	<update id="deleteReply" parameterType="String">
+	update REPLY
+	set REPLY_USE = 'N'
+	where REPLY_ID = #{reply_id}
+	
+	</update>
+	
+	
+  
+  
+</mapper>
